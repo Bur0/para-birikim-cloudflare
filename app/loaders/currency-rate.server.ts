@@ -1,4 +1,4 @@
-import { json, type LoaderFunctionArgs } from '@remix-run/node';
+import { json, type LoaderFunctionArgs } from '@remix-run/cloudflare';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '~/lib/firebase';
 import { redis } from '~/utils/redis.server';

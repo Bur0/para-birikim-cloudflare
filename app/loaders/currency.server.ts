@@ -2,7 +2,7 @@ import { db } from '~/lib/firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import { redis } from '~/utils/redis.server';
 import type { LoaderData } from '~/types/currency';
-import type { TypedResponse } from '@remix-run/node';
+import type { TypedResponse } from '@remix-run/cloudflare';
 
 export async function loader(): Promise<TypedResponse<LoaderData>> {
   try {
