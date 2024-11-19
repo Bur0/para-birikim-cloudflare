@@ -1,83 +1,60 @@
-import { db } from '~/lib/firebase';
-import { collection, getDocs } from 'firebase/firestore';
-import { redis } from '~/utils/redis.server';
-import type { LoaderData } from '~/types/currency';
-import type { TypedResponse } from '@remix-run/cloudflare';
-import { getCollection } from '~/lib/google.cloud';
-export async function loader(): Promise<TypedResponse<LoaderData>> {
+import { json } from "@remix-run/cloudflare";
+import { redis } from "~/utils/redis.server";
+import type { LoaderData } from "~/types/currency";
+import { getCollection } from "~/lib/google.cloud";
+
+const CACHE_KEY = "exchange_rates";
+const CACHE_DURATION = 3600; // 1 saat
+
+async function getCurrencyData() {
   try {
-    const cachedData = await redis.get('exchange_rates');
-
+    // 1. Cache'den veriyi al
+    const cachedData = await redis.get(CACHE_KEY);
     if (cachedData) {
-      const parsedData = typeof cachedData === 'string' ? JSON.parse(cachedData) : cachedData;
-      return new Response(
-        JSON.stringify({
-          rates: parsedData,
-          source: 'cache',
-        }),
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      ) as TypedResponse<LoaderData>;
+      return {
+        data: typeof cachedData === "string" ? JSON.parse(cachedData) : cachedData,
+        source: "cache",
+      };
     }
 
-    
-    const firestoreCollection = await getCollection();
-
-    if (firestoreCollection.empty) {
-      return new Response(
-        JSON.stringify({
-          rates: { latest: { currencies: {} } },
-          error: 'Döviz kuru verisi bulunamadı',
-          source: 'firestore',
-        }),
-        {
-          status: 404,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      ) as TypedResponse<LoaderData>;
+    // 2. Firestore'dan veriyi al
+    const firestoreData = await getCollection();
+    if (!firestoreData || !firestoreData.currencies) {
+      throw new Error("Döviz kuru verisi bulunamadı");
     }
 
-    
-    // Cache the data
-    await redis.set('exchange_rates', JSON.stringify(firestoreCollection), {
-      ex: 3600,
+    // 3. Veriyi cache'le
+    await redis.set(CACHE_KEY, JSON.stringify(firestoreData), {
+      ex: CACHE_DURATION,
     });
 
-    return new Response(
-      JSON.stringify({
-        rates: firestoreCollection,
-        source: 'firestore',
-      }),
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    ) as TypedResponse<LoaderData>;
+    return { data: firestoreData, source: "firestore" };
   } catch (error: any) {
-    console.error('Döviz kurları yüklenirken hata:', error);
-    const errorMessage =
-      error.code === 'permission-denied'
-        ? 'Döviz kurlarına erişim izniniz bulunmuyor'
-        : 'Döviz kurları yüklenemedi';
+    throw {
+      message:
+        error.code === "permission-denied"
+          ? "Döviz kurlarına erişim izniniz bulunmuyor"
+          : "Döviz kurları yüklenemedi",
+      status: error.code === "permission-denied" ? 403 : 500,
+      code: error.code,
+    };
+  }
+}
 
-    return new Response(
-      JSON.stringify({
-        rates: { latest: { currencies: {} } },
-        error: errorMessage,
-        source: 'firestore',
-      }),
+export async function loader() {
+  try {
+    const { data, source } = await getCurrencyData();
+    return json<LoaderData>({ rates: data, source });
+  } catch (error: any) {
+    return json<LoaderData>(
       {
-        status: error.code === 'permission-denied' ? 403 : 500,
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        rates: { currencies: {} },
+        error: error.message,
+        source: "error",
+      },
+      {
+        status: error.status || 500,
       }
-    ) as TypedResponse<LoaderData>;
+    );
   }
 }
