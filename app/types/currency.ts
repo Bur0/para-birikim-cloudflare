@@ -11,15 +11,13 @@ export interface Currency {
 }
 
 export interface ExchangeRates {
-  latest: {
-    currencies: Record<string, Currency>;
-  };
+  currencies: Record<string, Currency>;
 }
 
 export interface LoaderData {
   rates: ExchangeRates;
   error?: string;
-  source: 'cache' | 'firestore';
+  source: "cache" | "firestore";
 }
 
 export interface CurrencyCalculation {
@@ -37,5 +35,5 @@ export interface CurrencyCalculation {
 
 export interface CurrencyRateLoaderData {
   calculation: CurrencyCalculation;
-  source: 'cache' | 'firestore';
+  source: "cache" | "firestore";
 }

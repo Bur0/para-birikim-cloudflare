@@ -86,7 +86,8 @@ export const handle = {
 
 export default function DovizPage() {
   const { rates, error, source } = useLoaderData<typeof loader>();
-  const currencies = rates?.latest?.currencies || {};
+
+  const currencies = rates?.currencies || {};
   const sortedCurrencies = sortCurrencies(currencies);
   const [searchTerm, setSearchTerm] = useState("");
 

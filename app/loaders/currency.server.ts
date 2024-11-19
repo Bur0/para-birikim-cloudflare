@@ -3,7 +3,7 @@ import { collection, getDocs } from 'firebase/firestore';
 import { redis } from '~/utils/redis.server';
 import type { LoaderData } from '~/types/currency';
 import type { TypedResponse } from '@remix-run/cloudflare';
-
+import { getCollection } from '~/lib/google.cloud';
 export async function loader(): Promise<TypedResponse<LoaderData>> {
   try {
     const cachedData = await redis.get('exchange_rates');
@@ -23,10 +23,10 @@ export async function loader(): Promise<TypedResponse<LoaderData>> {
       ) as TypedResponse<LoaderData>;
     }
 
-    const ratesCollection = collection(db, 'exchange_rates');
-    const snapshot = await getDocs(ratesCollection);
+    
+    const firestoreCollection = await getCollection();
 
-    if (snapshot.empty) {
+    if (firestoreCollection.empty) {
       return new Response(
         JSON.stringify({
           rates: { latest: { currencies: {} } },
@@ -42,19 +42,15 @@ export async function loader(): Promise<TypedResponse<LoaderData>> {
       ) as TypedResponse<LoaderData>;
     }
 
-    const exchangeRates: Record<string, any> = {};
-    snapshot.forEach((doc) => {
-      exchangeRates[doc.id] = doc.data();
-    });
-
+    
     // Cache the data
-    await redis.set('exchange_rates', JSON.stringify(exchangeRates), {
+    await redis.set('exchange_rates', JSON.stringify(firestoreCollection), {
       ex: 3600,
     });
 
     return new Response(
       JSON.stringify({
-        rates: exchangeRates,
+        rates: firestoreCollection,
         source: 'firestore',
       }),
       {

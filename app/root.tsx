@@ -11,9 +11,13 @@ import type { LinksFunction } from "@remix-run//cloudflare";
 
 import Header from "~/components/Header";
 
-import "./tailwind.css?";
+import stylesheet from "~/tailwind.css?url";
 
 export const links: LinksFunction = () => [
+  {
+    rel: "stylesheet",
+    href: stylesheet,
+  },
   {
     rel: "preconnect",
     href: "https://fonts.googleapis.com",
@@ -42,7 +46,28 @@ export function Layout({ children }: { children: React.ReactNode }) {
     <html lang="tr" className="h-full">
       <head>
         <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
+
+        {process.env.NODE_ENV === "production" && (
+          <>
+            <script
+              async
+              src={`https://www.googletagmanager.com/gtag/js?id=G-8WWHJQF7LJ`}
+            ></script>
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-8WWHJQF7LJ', {
+            page_path: window.location.pathname,
+            });
+        `,
+              }}
+            />
+          </>
+        )}
         <Meta />
         <Links />
       </head>
