@@ -96,6 +96,7 @@ export default function CurrencyRate() {
 
     // URL formatı: /doviz/usd/100-amerikan-dolari-kac-tl
     const formattedAmount = amount.toString().replace(".", "-");
+    console.log("currency",currency);
     navigate(
       `/doviz/${currency}/${formattedAmount}-${currency.toLowerCase()}-kac-tl`
     );
@@ -146,7 +147,7 @@ export default function CurrencyRate() {
 
         {/* Popüler Tutarlar */}
         <PopularAmounts
-          currency={calculation.currencyCode}
+          currency={currency.toLowerCase()}
           amounts={popularAmounts}
         />
 
