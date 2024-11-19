@@ -46,7 +46,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
     <html lang="tr" className="h-full">
       <head>
         <meta charSet="utf-8" />
-        <meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
+        <meta
+          content="width=device-width, initial-scale=1, viewport-fit=cover"
+          name="viewport"
+        />
 
         {process.env.NODE_ENV === "production" && (
           <>
@@ -66,6 +69,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
         `,
               }}
             />
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `     (function(c,l,a,r,i,t,y){
+                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+            })(window, document, "clarity", "script", "p14r71tw8k");`,
+              }}
+            ></script>
           </>
         )}
         <Meta />
