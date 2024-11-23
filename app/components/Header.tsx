@@ -21,6 +21,7 @@ const NAVIGATION_ITEMS = [
       { label: "Altın Fiyatları", href: "/altin" },
       { label: "Borsa", href: "/borsa" },
       { label: "Kripto Paralar", href: "/kripto" },
+      { label: "Fınıdık Fiyatları", href: "/enerji" },
     ],
   },
   {

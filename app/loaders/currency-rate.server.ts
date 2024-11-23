@@ -1,12 +1,12 @@
 import { json, type LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { redis } from "~/utils/redis.server";
-import { slugToCode } from "~/utils/slugToCode";
+import { normalizeCurrencyCode } from "~/utils/currency";
 import type { CurrencyRateLoaderData } from "~/types/currency";
 import { getCollection } from "~/lib/google.cloud";
 
 export async function loader({ params }: LoaderFunctionArgs) {
   const { currency, rate = "1" } = params;
-  const currencySlug = slugToCode(currency);
+  const currencySlug = normalizeCurrencyCode(currency.toLowerCase());
 
   console.log("Debug - Params:", { currency, rate, currencySlug });
 

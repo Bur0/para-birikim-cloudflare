@@ -1,7 +1,7 @@
 import type { MetaFunction } from "@remix-run/cloudflare";
 import { useLoaderData, useNavigate } from "@remix-run/react";
 import { useState, memo, useMemo } from "react";
-import { codeToSlug } from "~/utils/codeToSlug";
+import { getLocalizedCurrencyName, normalizeCurrencyCode } from "~/utils/currency";
 
 import TradingViewWidget from "~/components/TradingViewWidget";
 import { Card, CardHeader } from "~/components/ui/card";
@@ -42,8 +42,10 @@ const MemoizedTradingViewWidget = memo(TradingViewWidget);
 
 // State tipleri
 interface CurrencyResultState {
-  [key: string]: number;
-  TRY: number;
+  amount: number;
+  convertedAmount: number;
+  fromCurrency: string;
+  toCurrency: string;
 }
 
 // Breadcrumb konfigürasyonu
@@ -68,10 +70,6 @@ export default function CurrencyRate() {
   const navigate = useNavigate();
   const [currency, setCurrency] = useState(calculation.currencySlug);
   const [amount, setAmount] = useState<number | "">(calculation.amount);
-  const [result, setResult] = useState<CurrencyResultState>({
-    [calculation.currencyCode]: calculation.amount,
-    TRY: parseFloat(calculation.sellingTotal),
-  });
 
   // Event handlers
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,26 +78,14 @@ export default function CurrencyRate() {
   };
 
   const handleCurrencyChange = (newCurrency: string) => {
-    setCurrency(codeToSlug(newCurrency));
+    const slug = getLocalizedCurrencyName(newCurrency);
+    setCurrency(slug);
   };
 
   const handleCalculate = () => {
-    if (typeof amount !== "number" || isNaN(amount) || amount === 0) return;
-
-    const exchangeRate = parseFloat(currentRate.selling_rate.replace(",", "."));
-    const calculatedResult = amount * exchangeRate;
-
-    setResult({
-      [calculation.currencyCode]: amount,
-      TRY: calculatedResult,
-    });
-
-    // URL formatı: /doviz/usd/100-amerikan-dolari-kac-tl
-    const formattedAmount = amount.toString().replace(".", "-");
-    console.log("currency",currency);
-    navigate(
-      `/doviz/${currency}/${formattedAmount}-${currency.toLowerCase()}-kac-tl`
-    );
+    if (typeof amount !== "number" || isNaN(amount) || amount <= 0) return;
+    // Hesapla butonuna basıldığında URL'i güncelle ve sayfayı yenile
+    navigate(`/doviz/${currency}/${amount}`, { replace: true });
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -140,9 +126,14 @@ export default function CurrencyRate() {
           onAmountChange={handleAmountChange}
           onSubmit={handleSubmit}
           onCurrencyChange={handleCurrencyChange}
-          result={result}
-          rate={calculation.amount}
+          result={{
+            amount: calculation.amount,
+            convertedAmount: parseFloat(calculation.sellingTotal),
+            fromCurrency: calculation.currencyCode,
+            toCurrency: "TRY"
+          }}
           currency={calculation.currencyCode}
+          rate={calculation.amount}
         />
 
         {/* Popüler Tutarlar */}
@@ -152,10 +143,10 @@ export default function CurrencyRate() {
         />
 
         {/* Grafik */}
-        <Card className="h-[400px] w-[900px] mt-4">
+        {/* <Card className="h-[400px] w-[900px] mt-4 mb-22">
           <CardHeader>{calculation.currencyCode}/TRY Grafiği</CardHeader>
           <MemoizedTradingViewWidget symbol={tradingPairData} />
-        </Card>
+        </Card> */}
       </div>
 
       {/* Yan Panel */}

@@ -10,6 +10,7 @@ import {
 import type { LinksFunction } from "@remix-run//cloudflare";
 
 import Header from "~/components/Header";
+import Footer from "~/components/Footer";
 
 import "./tailwind.css";
 
@@ -89,80 +90,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
           : error instanceof Error
           ? error.message
           : null}
-        <main className="flex-grow">
+        <main className="flex-1">
           <div className="max-w-screen-xl mx-auto px-6">{children}</div>
         </main>
-
-        <footer className="mt-auto bg-primary/5 border-t">
-          <div className="max-w-screen-xl mx-auto px-6 py-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div>
-                <h3 className="font-semibold text-lg mb-4">Para Birikim</h3>
-                <p className="text-sm text-muted-foreground">
-                  Güncel döviz kurları, altın fiyatları ve borsa verilerini
-                  takip edebileceğiniz finansal bilgi platformu.
-                </p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg mb-4">Hızlı Erişim</h3>
-                <ul className="space-y-2 text-sm">
-                  <li>
-                    <a
-                      href="/"
-                      className="text-muted-foreground hover:text-primary"
-                    >
-                      Ana Sayfa
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="/doviz/usd"
-                      className="text-muted-foreground hover:text-primary"
-                    >
-                      Döviz Kurları
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="/altin"
-                      className="text-muted-foreground hover:text-primary"
-                    >
-                      Altın Fiyatları
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="/borsa"
-                      className="text-muted-foreground hover:text-primary"
-                    >
-                      Borsa Verileri
-                    </a>
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg mb-4">İletişim</h3>
-                <ul className="space-y-2 text-sm">
-                  <li className="text-muted-foreground">
-                    Email: info@parabirik.im
-                  </li>
-                  <li className="text-muted-foreground">
-                    Twitter: @parabirikim
-                  </li>
-                  <li className="text-muted-foreground">
-                    Instagram: @parabirikim
-                  </li>
-                </ul>
-              </div>
-            </div>
-            <div className="mt-8 pt-8 border-t text-center text-sm text-muted-foreground">
-              <p>
-                &copy; {new Date().getFullYear()} Para Birikim. Tüm hakları
-                saklıdır.
-              </p>
-            </div>
-          </div>
-        </footer>
+        <Footer />
         <ScrollRestoration />
         <Scripts />
       </body>

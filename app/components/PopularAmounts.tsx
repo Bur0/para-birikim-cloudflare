@@ -13,7 +13,7 @@ export function PopularAmounts({ currency, amounts }: PopularAmountsProps) {
     <div className="flex gap-2 mt-4 flex-wrap">
       {amounts.map((amount) => (
         <Button key={amount} variant="outline" asChild>
-          <Link to={`/doviz/${currencyLower}/${amount}`}>
+          <Link reloadDocument to={`/doviz/${currencyLower}/${amount}`}>
             {amount} {currencyLower} kaç tl
           </Link>
         </Button>

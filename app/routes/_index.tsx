@@ -13,7 +13,7 @@ import { ScrollArea } from "~/components/ui/scroll-area";
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "Para Birikim - Döviz, Altın ve Borsa Takibi" },
+    { title: "Parakredim - Döviz, Altın ve Borsa Takibi" },
     {
       name: "description",
       content: "Güncel döviz kurları, altın fiyatları ve borsa verileri",

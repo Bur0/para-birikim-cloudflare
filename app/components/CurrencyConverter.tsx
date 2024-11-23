@@ -1,14 +1,15 @@
-import { Button } from '~/components/ui/button';
-import { Card } from '~/components/ui/card';
-import { Input } from '~/components/ui/input';
-import { CurrencySelect } from '~/components/CurrencySelect';
-import { ArrowRightLeft } from 'lucide-react';
-import { formatCurrency } from '~/lib/utils';
+import { Button } from "~/components/ui/button";
+import { Card } from "~/components/ui/card";
+import { Input } from "~/components/ui/input";
+import { CurrencySelect } from "~/components/CurrencySelect";
+import { ArrowRightLeft } from "lucide-react";
+import { formatCurrency } from "~/utils/currency";
 
 interface CurrencyResult {
-  USD: number;
-  TRY: number;
-  [key: string]: number;
+  amount: number;
+  convertedAmount: number;
+  fromCurrency: string;
+  toCurrency: string;
 }
 
 interface CurrencyConverterProps {
@@ -24,7 +25,7 @@ interface CurrencyConverterProps {
 function CurrencyInput({
   amount,
   onChange,
-  className = '',
+  className = "",
 }: {
   amount: string | number;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -44,17 +45,16 @@ function CurrencyInput({
   );
 }
 
-function CurrencyResult({
-  rate,
-  result,
-  currency,
-}: Pick<CurrencyConverterProps, 'rate' | 'result' | 'currency'>) {
+function CurrencyResult({ result }: { result: CurrencyResult }) {
   return (
     <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
       <div className="flex items-center gap-2">
-        <span className="text-3xl">{formatCurrency(rate, currency)}</span>={' '}
+        <span className="text-3xl">
+          {formatCurrency(result.amount, result.fromCurrency)}
+        </span>
+        =
         <span className="text-3xl text-emerald-500 underline">
-          {formatCurrency(result.TRY, 'TRY')}
+          {formatCurrency(result.convertedAmount, result.toCurrency)}
         </span>
       </div>
     </h2>
@@ -68,18 +68,13 @@ export function CurrencyConverter({
   onCurrencyChange,
   result,
   currency,
-  rate,
 }: CurrencyConverterProps) {
   return (
     <Card className="mt-4 px-6 py-8 flex gap-4 flex-col">
       <form onSubmit={onSubmit} className="contents">
         <div className="flex flex-row gap-4 items-center">
           <CurrencySelect defaultValue={currency} onChange={onCurrencyChange} />
-          {/* TODO: İleride eklenecek
-          <Button type="button" variant="outline" size="icon">
-            <ArrowRightLeft />
-          </Button> */}
-          <CurrencySelect defaultValue="TRY" />
+          <CurrencySelect defaultValue="TRY" disabled />
           <CurrencyInput amount={amount} onChange={onAmountChange} />
           <Button type="submit" size="lg">
             Hesapla
@@ -87,7 +82,7 @@ export function CurrencyConverter({
         </div>
       </form>
       <div>
-        <CurrencyResult rate={rate} result={result} currency={currency} />
+        <CurrencyResult result={result} />
       </div>
     </Card>
   );

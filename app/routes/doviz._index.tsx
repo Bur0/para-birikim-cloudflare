@@ -15,7 +15,7 @@ import { loader } from "~/loaders/currency.server";
 import {
   formatCurrencyValue,
   getCurrencyBadgeColor,
-  currencyFormatter,
+  formatCurrency,
   sortCurrencies,
 } from "~/utils/currency";
 import type { Currency, LoaderData } from "~/types/currency";
@@ -56,10 +56,10 @@ const CurrencyRow = ({ code, currency }: CurrencyRowProps) => (
       </Link>
     </TableCell>
     <TableCell className="text-right py-4 hidden md:table-cell">
-      {currencyFormatter.format(formatCurrencyValue(currency.buying_rate))}
+      {formatCurrency(formatCurrencyValue(currency.buying_rate),"TRY")}
     </TableCell>
     <TableCell className="text-right py-4">
-      {currencyFormatter.format(formatCurrencyValue(currency.selling_rate))}
+      {formatCurrency(formatCurrencyValue(currency.selling_rate),"TRY")}
     </TableCell>
     <TableCell className="text-right py-4">
       <Badge className={getCurrencyBadgeColor(currency.change)}>
@@ -67,10 +67,10 @@ const CurrencyRow = ({ code, currency }: CurrencyRowProps) => (
       </Badge>
     </TableCell>
     <TableCell className="text-right py-4 hidden md:table-cell">
-      {currencyFormatter.format(formatCurrencyValue(currency.high))}
+      {formatCurrency(formatCurrencyValue(currency.high),"TRY")}
     </TableCell>
     <TableCell className="text-right py-4 pr-4 hidden md:table-cell">
-      {currencyFormatter.format(formatCurrencyValue(currency.low))}
+      {formatCurrency(formatCurrencyValue(currency.low),"TRY")}
     </TableCell>
   </TableRow>
 );
